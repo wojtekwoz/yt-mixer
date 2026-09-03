@@ -1,26 +1,112 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Chrome is achromatic on purpose: the cover art supplies every other
+     colour on screen. See DESIGN.md. */
+  --color-bg: oklch(1 0 0);
+  --color-ink: oklch(0.18 0 0);
+  --color-ink-soft: oklch(0.46 0 0);
+  --color-line: oklch(0.9 0 0);
+  --color-surface: oklch(0.965 0 0);
+  --color-go: oklch(0.72 0.16 170);
+  --color-go-deep: oklch(0.52 0.13 170);
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  /* Dragging the fader shouldn't scroll the page on a tablet. */
+  overscroll-behavior-y: contain;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-go-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* The disc. Rotation is bound to playback, so "spinning" means "playing" —
+   but a paused disc also carries a play triangle, because motion must never
+   be the only signal. */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.disc-spin {
+  animation: spin 8s linear infinite;
+}
+
+.disc-paused {
+  animation-play-state: paused;
+}
+
+/* Grooves. A repeating conic sheen reads as vinyl without an image. */
+.vinyl {
+  background:
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      oklch(0.28 0 0) 0 1.5px,
+      oklch(0.13 0 0) 1.5px 5px
+    );
+}
+
+/* The light-catch a real record gets from a window. Static while the grooves
+   rotate underneath, which is what makes the rotation legible at all. */
+.sheen {
+  background: conic-gradient(
+    from 210deg,
+    transparent 0deg,
+    oklch(1 0 0 / 0.16) 40deg,
+    transparent 90deg,
+    transparent 180deg,
+    oklch(1 0 0 / 0.1) 220deg,
+    transparent 270deg
+  );
+}
+
+/* One depth device in the whole app: a solid bottom edge that compresses. */
+.key {
+  box-shadow: 0 6px 0 0 var(--color-go-deep);
+  transition:
+    transform 120ms var(--ease-out-quart),
+    box-shadow 120ms var(--ease-out-quart);
+}
+
+.key:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 0 var(--color-go-deep);
+}
+
+.key:disabled {
+  box-shadow: 0 6px 0 0 var(--color-line);
+}
+
+dialog::backdrop {
+  background: oklch(0.18 0 0 / 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disc-spin {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
 }
