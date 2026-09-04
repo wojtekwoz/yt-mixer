@@ -46,7 +46,7 @@ export function Record({ id }: { id: DeckId }) {
             ? `${deck.playing ? "Pause" : "Play"} ${label ?? "this song"}`
             : "Empty record"
         }
-        className="group relative aspect-square w-full max-w-[15rem] rounded-full transition-[transform,opacity] duration-150 ease-[var(--ease-out-quart)] disabled:cursor-default"
+        className="group relative aspect-square w-full max-w-[13rem] rounded-full transition-[transform,opacity] duration-150 ease-[var(--ease-out-quart)] disabled:cursor-default"
         style={{
           transform: `scale(${0.72 + gain * 0.28})`,
           opacity: deck.track ? 0.5 + gain * 0.5 : 0.28,

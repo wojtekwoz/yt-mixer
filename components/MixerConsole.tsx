@@ -5,6 +5,7 @@ import { Record } from "./Record";
 import { BigFader } from "./BigFader";
 import { UpNext } from "./UpNext";
 import { ShareButton } from "./ShareButton";
+import { Visualizer } from "./Visualizer";
 import { NowPlayingPublisher } from "./NowPlayingPublisher";
 import { useMixer } from "@/lib/store";
 import { FADE_SECONDS, mix, startEngine } from "@/lib/engine";
@@ -25,23 +26,25 @@ export function MixerConsole() {
   const mixProgress = fading ? (fading.to === "B" ? crossfader : 1 - crossfader) : 0;
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[44rem] flex-col gap-7 px-5 pb-10 pt-5">
+    <div className="mx-auto flex min-h-dvh max-w-[44rem] flex-col gap-6 px-5 pb-10">
       <NowPlayingPublisher />
 
-      <header className="flex items-center justify-between">
-        <h1 className="text-base font-extrabold tracking-tight">yt mixer</h1>
-        <ShareButton />
-      </header>
+      {/* No visible wordmark or nav — the face is the interface. The heading
+          stays for screen readers and document structure. */}
+      <h1 className="sr-only">yt mixer</h1>
 
-      {/* Never stacks: the fader below depends on this left/right mapping. */}
-      <div className="grid grid-cols-2 gap-4">
-        <Record id="A" />
-        <Record id="B" />
+      <Visualizer />
+
+      {/* The face. Eyes, then a mouth with a tongue hanging out of it. */}
+      <div className="flex flex-col gap-5 rounded-2xl bg-surface px-4 pb-4 pt-6">
+        <div className="grid grid-cols-2 gap-4">
+          <Record id="A" />
+          <Record id="B" />
+        </div>
+        <BigFader />
       </div>
 
-      <BigFader />
-
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-4 pt-6">
         <button
           type="button"
           onClick={mix}
@@ -77,6 +80,10 @@ export function MixerConsole() {
       <hr className="border-line" />
 
       <UpNext />
+
+      <div className="mt-auto flex justify-center pt-6">
+        <ShareButton />
+      </div>
     </div>
   );
 }

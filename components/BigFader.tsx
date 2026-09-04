@@ -5,11 +5,14 @@ import { useMixer } from "@/lib/store";
 import { cancelFade } from "@/lib/engine";
 
 /**
- * The one control that matters.
+ * The one control that matters — and the robot's mouth.
  *
  * It spans the full width directly under the two records, so the knob sits
  * under whichever record you are hearing. Position means exactly what it looks
  * like it means — no legend, no A/B labels, no numbers.
+ *
+ * The knob is the tongue: it hangs below the track on purpose, so it reads as
+ * part of a face rather than as a slider.
  */
 export function BigFader() {
   const crossfader = useMixer((s) => s.crossfader);
@@ -21,7 +24,7 @@ export function BigFader() {
       const rect = trackRef.current?.getBoundingClientRect();
       if (!rect) return;
       // Inset by half a knob so the knob centre can reach both ends.
-      const pad = 34;
+      const pad = 30;
       const usable = Math.max(1, rect.width - pad * 2);
       cancelFade();
       setCrossfader(Math.min(1, Math.max(0, (clientX - rect.left - pad) / usable)));
@@ -70,16 +73,18 @@ export function BigFader() {
       onPointerDown={onPointerDown}
       onPointerMove={(event) => event.buttons > 0 && setFromPointer(event.clientX)}
       onKeyDown={onKeyDown}
-      className="relative h-[68px] w-full cursor-grab touch-none select-none rounded-full bg-surface active:cursor-grabbing"
+      className="relative h-[60px] w-full cursor-grab touch-none select-none rounded-full bg-bg active:cursor-grabbing"
     >
       <span
         aria-hidden
-        className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-line"
+        className="absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-line"
       />
+      {/* The tongue. Taller than the mouth and sitting low in it, so it laps
+          over the bottom edge instead of being contained by it. */}
       <span
         aria-hidden
-        className="absolute top-1/2 h-[52px] w-[52px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink shadow-[0_4px_10px_oklch(0.18_0_0/0.28)]"
-        style={{ left: `calc(34px + ${crossfader} * (100% - 68px))` }}
+        className="absolute h-[76px] w-[52px] -translate-x-1/2 rounded-[26px] bg-ink shadow-[0_6px_14px_oklch(0.18_0_0/0.3)]"
+        style={{ left: `calc(30px + ${crossfader} * (100% - 60px))`, top: 12 }}
       />
     </div>
   );

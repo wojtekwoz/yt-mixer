@@ -34,9 +34,26 @@ font.
 Four sizes only: `0.8rem` (meta), `1rem` (body), `1.25rem` (song title),
 `clamp(1.5rem, 6vw, 2.25rem)` (the Mix button). Two weights: 500 and 800.
 
+## Layout: the robot
+
+Top to bottom: hair, face, then the controls. There is no visible wordmark or
+nav — the face is the interface. The `<h1>` remains for screen readers.
+
+- **Hair** — a full-width band of bars. Not a spectrum analyser (impossible
+  through a cross-origin iframe); it is driven by each deck's real gain and play
+  state, so silence is flat and a crossfade visibly blends two waves.
+- **Face** — a `--surface` box at 16px radius holding the two records (eyes) and
+  the fader (mouth).
+- **Tongue** — the fader knob is taller than its track and sits low in it, so it
+  laps 28px past the mouth and 12px past the face. It is the one element allowed
+  to break its container.
+- Everything else — Mix, Auto, the queue, and Share at the very bottom — sits
+  outside the face on plain background.
+
 ## Shape and depth
 
-- Radius is either `999px` (pills, discs) or `1.25rem` (wells). Nothing between.
+- Radius is `999px` (pills, discs), `16px` (the face), or `1.5rem` (wells and
+  input fields). Nothing else.
 - One depth device: a solid bottom edge on the Mix button that compresses 3px on
   press, and a cast shadow on the fader knob. No decorative shadows anywhere.
 - No cards, no panels, no borders around groups. Whitespace does the grouping.
