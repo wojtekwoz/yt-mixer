@@ -26,22 +26,24 @@ export function MixerConsole() {
   const mixProgress = fading ? (fading.to === "B" ? crossfader : 1 - crossfader) : 0;
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[44rem] flex-col gap-6 px-5 pb-10">
+    <div className="mx-auto flex min-h-dvh max-w-[44rem] flex-col gap-7 px-5 pb-10 pt-5">
       <NowPlayingPublisher />
 
       {/* No visible wordmark or nav — the face is the interface. The heading
           stays for screen readers and document structure. */}
       <h1 className="sr-only">yt mixer</h1>
 
-      <Visualizer />
-
-      {/* The face. Eyes, then a mouth with a tongue hanging out of it. */}
-      <div className="flex flex-col gap-5 rounded-2xl bg-surface px-4 pb-4 pt-6">
-        <div className="grid grid-cols-2 gap-4">
-          <Record id="A" />
-          <Record id="B" />
+      {/* One head: hair and face share a body with nothing between them. The
+          tongue is the only thing allowed to break out of it. */}
+      <div className="rounded-2xl bg-panel">
+        <Visualizer />
+        <div className="flex flex-col gap-5 px-4 pb-4 pt-5">
+          <div className="grid grid-cols-2 gap-4">
+            <Record id="A" />
+            <Record id="B" />
+          </div>
+          <BigFader />
         </div>
-        <BigFader />
       </div>
 
       <div className="flex flex-col items-center gap-4 pt-6">

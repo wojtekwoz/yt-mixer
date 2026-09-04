@@ -20,10 +20,13 @@ other colour on screen. One accent, reserved for the primary action.
 | `--ink-soft` | `oklch(0.46 0 0)` | Secondary type and placeholders. ~5.6:1 on bg. |
 | `--line` | `oklch(0.90 0 0)` | Hairlines. |
 | `--surface` | `oklch(0.965 0 0)` | Fader track, input wells. |
-| `--go` | `oklch(0.72 0.16 170)` | The Mix button, Auto when on, focus ring. |
-| `--go-deep` | `oklch(0.52 0.13 170)` | Pressed edge, focus ring. |
+| `--panel` | `oklch(0.935 0 0)` | The head. A shade darker than the wells so the body reads as an object. |
+| `--go` | `oklch(0.7 0.196 45)` | Juicy orange. Mix, Auto when on, `+`, live hair. |
+| `--go-deep` | `oklch(0.55 0.17 42)` | Pressed edge, focus ring. |
 
-`--go` is a fill only, never text on white (2.4:1). Ink on `--go` is ~8:1.
+`--go` is a fill only, never text on white. Ink on `--go` measures 6.50:1.
+Reference point is Teenage Engineering hardware: light grey body, one saturated
+orange, black labels, no gradients.
 
 ## Typography
 
@@ -39,9 +42,10 @@ Four sizes only: `0.8rem` (meta), `1rem` (body), `1.25rem` (song title),
 Top to bottom: hair, face, then the controls. There is no visible wordmark or
 nav — the face is the interface. The `<h1>` remains for screen readers.
 
-- **Hair** — a full-width band of bars. Not a spectrum analyser (impossible
-  through a cross-origin iframe); it is driven by each deck's real gain and play
-  state, so silence is flat and a crossfade visibly blends two waves.
+- **Hair** — a band of bars sharing the head's grey, flush against the face.
+  Two sources: real audio when the DJ has shared the tab's sound (bars turn
+  orange, because the colour change is the signal that these are the sound
+  itself), otherwise a drawing of the mix from deck gains (bars stay ink).
 - **Face** — a `--surface` box at 16px radius holding the two records (eyes) and
   the fader (mouth).
 - **Tongue** — the fader knob is taller than its track and sits low in it, so it

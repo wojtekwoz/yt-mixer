@@ -28,6 +28,12 @@ keeps the quiet record loaded, and mixes into it as each song ends.
 adds every one. Tap a song to put it on a free record; tap the ✕ to bin it. A
 `?t=90` in a link becomes that song's start point.
 
+**Hair.** The band of bars on top of the head. Tap `EAR OFF` to hand it this
+tab's real sound: pick this tab in the picker and switch on "Also share tab
+audio". The bars turn orange and are then a genuine FFT of what you're hearing.
+Left off, they draw the mix from deck gains instead — honest, but not the audio.
+Chrome and Edge only; Safari and Firefox can't capture tab audio.
+
 **Share.** One button. It hands you a link; friends open it, pick a nickname, and
 send you songs. You get ✓ / ✕ on each request, and a count on the button so you
 never miss one.
@@ -47,11 +53,18 @@ of it back, it is a small amount of code, and `git log` has the originals.
 
 ## The one hard constraint
 
-YouTube plays in a cross-origin iframe. The page cannot reach the audio stream,
-so **there is no EQ, filter, waveform or BPM detection, and none is possible**
-through the IFrame API. What it exposes is volume, seek, playback rate and time —
-so a mix here is an equal-power volume blend between two players. That is also
-why the crossfade is drawn as size: it is the honest picture of what is happening.
+YouTube plays in a cross-origin iframe. The page cannot reach that audio stream,
+so **there is no EQ, filter or BPM detection, and none is possible** through the
+IFrame API. What it exposes is volume, seek, playback rate and time — so a mix
+here is an equal-power volume blend between two players. That is also why the
+crossfade is drawn as size: it is the honest picture of what is happening.
+
+The visualiser is the one place that constraint can be worked around, and only
+sideways: `getDisplayMedia({ audio: true })` captures the whole tab's output,
+which can then go through an AnalyserNode. That is real audio, but it costs a
+permission prompt and a sharing indicator, so it is opt-in and off by default.
+`suppressLocalAudioPlayback` is explicitly false — the capture is a tap, so
+turning the ear on never silences the room.
 
 Both players are created once at startup and never destroyed; tracks are swapped
 in with `loadVideoById`. That is what lets an unattended Auto mix start playback
