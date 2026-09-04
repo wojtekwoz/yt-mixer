@@ -246,6 +246,33 @@ export function startFade(to: DeckId, seconds = FADE_SECONDS) {
   whenAudible(to, animate);
 }
 
+/** Below this a record contributes nothing you could hear. */
+const AUDIBLE = 0.01;
+
+/**
+ * Moves the fader by hand, starting whatever that makes audible.
+ *
+ * Dragging the tongue toward a parked record should bring that record in, not
+ * slide into silence. Unlike a Mix this does not wait for buffering: the DJ is
+ * driving the volume themselves, and freezing their drag would feel broken. The
+ * record arrives as soon as it has spun up, which is also why nudging the fader
+ * early warms a record up for a later Mix.
+ */
+export function setCrossfaderByHand(value: number) {
+  cancelFade();
+  useMixer.getState().setCrossfader(value);
+
+  for (const id of DECK_IDS) {
+    const deck = useMixer.getState().decks[id];
+    // `buffering` covers the window after playVideo but before it reports
+    // playing, so a drag doesn't fire playVideo on every pointer move.
+    if (!deck.track || deck.playing || deck.buffering) continue;
+    if (deckGain(id) > AUDIBLE) play(id);
+  }
+
+  applyGains();
+}
+
 export function cancelFade() {
   stopFadeTimer();
   abortPendingStart?.();

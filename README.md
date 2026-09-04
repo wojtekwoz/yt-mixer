@@ -14,9 +14,14 @@ pnpm dev
 label. Tap a record to play or pause it. A record that is spinning is playing; a
 record that is stopped shows a play triangle.
 
-**One slider.** Drag it and the music moves from one record to the other. The
-record you hear grows and brightens; the other shrinks and dims. The knob sits
-under whichever record is loud. No labels, no numbers, no reading.
+**One slider.** Drag the tongue and the music moves from one record to the
+other. The record you hear grows and brightens; the other shrinks and dims. The
+tongue sits under whichever record is loud. No labels, no numbers, no reading.
+
+Dragging toward a parked record starts it — the tongue never slides into
+silence. It does not wait for buffering the way Mix does, because freezing your
+drag would feel broken; the record arrives as soon as it has spun up. A record
+you drag away from keeps rolling silently, like a real deck.
 
 **Mix.** The big button does that fade for you, over 8 seconds. Tap it again
 mid-fade to stop.

@@ -49,7 +49,8 @@ nav — the face is the interface. The `<h1>` remains for screen readers.
   itself), otherwise a drawing of the mix from deck gains (bars stay ink).
 - **Face** — a `--surface` box at 16px radius holding the two records (eyes) and
   the fader (mouth).
-- **Tongue** — the fader knob is an SVG tongue: narrow where it leaves the
+- **Tongue** — dragging it toward a parked record starts that record, so the
+  fader never slides into silence. The knob is an SVG tongue: narrow where it leaves the
   mouth, bulging wider, round full tip, with a crease down the middle. It is
   taller than its track and sits low in it, so it laps past the mouth and past
   the face. The one element allowed to break its container.

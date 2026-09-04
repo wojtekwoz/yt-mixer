@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, type KeyboardEvent, type PointerEvent } from "react";
 import { useMixer } from "@/lib/store";
-import { cancelFade } from "@/lib/engine";
+import { setCrossfaderByHand } from "@/lib/engine";
 
 /**
  * The one control that matters — and the robot's mouth.
@@ -16,21 +16,16 @@ import { cancelFade } from "@/lib/engine";
  */
 export function BigFader() {
   const crossfader = useMixer((s) => s.crossfader);
-  const setCrossfader = useMixer((s) => s.setCrossfader);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const setFromPointer = useCallback(
-    (clientX: number) => {
-      const rect = trackRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      // Inset by half a knob so the knob centre can reach both ends.
-      const pad = 34;
-      const usable = Math.max(1, rect.width - pad * 2);
-      cancelFade();
-      setCrossfader(Math.min(1, Math.max(0, (clientX - rect.left - pad) / usable)));
-    },
-    [setCrossfader],
-  );
+  const setFromPointer = useCallback((clientX: number) => {
+    const rect = trackRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    // Inset by half a knob so the knob centre can reach both ends.
+    const pad = 34;
+    const usable = Math.max(1, rect.width - pad * 2);
+    setCrossfaderByHand(Math.min(1, Math.max(0, (clientX - rect.left - pad) / usable)));
+  }, []);
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -41,16 +36,13 @@ export function BigFader() {
     const steps: Record<string, number> = { ArrowLeft: -0.1, ArrowRight: 0.1 };
     if (event.key in steps) {
       event.preventDefault();
-      cancelFade();
-      setCrossfader(crossfader + steps[event.key]);
+      setCrossfaderByHand(crossfader + steps[event.key]);
     } else if (event.key === "Home") {
       event.preventDefault();
-      cancelFade();
-      setCrossfader(0);
+      setCrossfaderByHand(0);
     } else if (event.key === "End") {
       event.preventDefault();
-      cancelFade();
-      setCrossfader(1);
+      setCrossfaderByHand(1);
     }
   };
 
