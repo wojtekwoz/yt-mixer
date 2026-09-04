@@ -24,7 +24,7 @@ export function BigFader() {
       const rect = trackRef.current?.getBoundingClientRect();
       if (!rect) return;
       // Inset by half a knob so the knob centre can reach both ends.
-      const pad = 30;
+      const pad = 34;
       const usable = Math.max(1, rect.width - pad * 2);
       cancelFade();
       setCrossfader(Math.min(1, Math.max(0, (clientX - rect.left - pad) / usable)));
@@ -81,11 +81,28 @@ export function BigFader() {
       />
       {/* The tongue. Taller than the mouth and sitting low in it, so it laps
           over the bottom edge instead of being contained by it. */}
-      <span
+      <svg
         aria-hidden
-        className="absolute h-[76px] w-[52px] -translate-x-1/2 rounded-[26px] bg-ink shadow-[0_6px_14px_oklch(0.18_0_0/0.3)]"
-        style={{ left: `calc(30px + ${crossfader} * (100% - 60px))`, top: 12 }}
-      />
+        viewBox="0 0 64 68"
+        width={64}
+        height={68}
+        className="pointer-events-none absolute -translate-x-1/2 drop-shadow-[0_6px_10px_oklch(0.18_0_0/0.26)]"
+        style={{ left: `calc(34px + ${crossfader} * (100% - 68px))`, top: 18 }}
+      >
+        {/* Narrower where it leaves the mouth, bulging to full width, broad
+            round tip — a tongue lolling out rather than a knob. */}
+        <path
+          d="M12 0 C6 14 0 26 0 40 C0 57 14 68 32 68 C50 68 64 57 64 40 C64 26 58 14 52 0 Z"
+          fill="var(--color-tongue)"
+        />
+        <path
+          d="M32 10 C29 24 29 38 32 52"
+          fill="none"
+          stroke="var(--color-tongue-deep)"
+          strokeWidth={3}
+          strokeLinecap="round"
+        />
+      </svg>
     </div>
   );
 }

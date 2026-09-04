@@ -13,6 +13,10 @@
   --color-panel: oklch(0.935 0 0);
   --color-go: oklch(0.7 0.196 45);
   --color-go-deep: oklch(0.55 0.17 42);
+  /* The tongue is the one character element that gets its own colour. It is
+     not a UI state and never appears anywhere else. */
+  --color-tongue: oklch(0.68 0.16 22);
+  --color-tongue-deep: oklch(0.5 0.14 20);
 
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;

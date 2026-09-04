@@ -23,6 +23,7 @@ other colour on screen. One accent, reserved for the primary action.
 | `--panel` | `oklch(0.935 0 0)` | The head. A shade darker than the wells so the body reads as an object. |
 | `--go` | `oklch(0.7 0.196 45)` | Juicy orange. Mix, Auto when on, `+`, live hair. |
 | `--go-deep` | `oklch(0.55 0.17 42)` | Pressed edge, focus ring. |
+| `--tongue` / `--tongue-deep` | `oklch(0.68 0.16 22)` / `oklch(0.5 0.14 20)` | The tongue and its crease. A character element, not a UI state — it appears nowhere else. |
 
 `--go` is a fill only, never text on white. Ink on `--go` measures 6.50:1.
 Reference point is Teenage Engineering hardware: light grey body, one saturated
@@ -48,9 +49,10 @@ nav — the face is the interface. The `<h1>` remains for screen readers.
   itself), otherwise a drawing of the mix from deck gains (bars stay ink).
 - **Face** — a `--surface` box at 16px radius holding the two records (eyes) and
   the fader (mouth).
-- **Tongue** — the fader knob is taller than its track and sits low in it, so it
-  laps 28px past the mouth and 12px past the face. It is the one element allowed
-  to break its container.
+- **Tongue** — the fader knob is an SVG tongue: narrow where it leaves the
+  mouth, bulging wider, round full tip, with a crease down the middle. It is
+  taller than its track and sits low in it, so it laps past the mouth and past
+  the face. The one element allowed to break its container.
 - Everything else — Mix, Auto, the queue, and Share at the very bottom — sits
   outside the face on plain background.
 
