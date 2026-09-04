@@ -137,12 +137,77 @@ export function landingDeck(): DeckId {
 
 /* --------------------------------------------------------------- mixes -- */
 
-let fadeFrame = 0;
+let fadeTimer: ReturnType<typeof setInterval> | null = null;
+/** Tears down a pending "waiting for the incoming record" subscription. */
+let abortPendingStart: (() => void) | null = null;
+
+/** How long to wait for a cued record to start before mixing into it anyway. */
+const START_TIMEOUT_MS = 6000;
+
+/**
+ * Fade tick. Deliberately a timer rather than requestAnimationFrame: browsers
+ * pause rAF in background tabs, and a DJ hunting for the next song on another
+ * tab would come back to a mix frozen half-way with both records at partial
+ * volume. A timer keeps running (throttled to ~1s while hidden), and because
+ * progress is read from the clock rather than counted in frames, a throttled
+ * tick still lands the fader in exactly the right place.
+ */
+const FADE_TICK_MS = 33;
+
+function stopFadeTimer() {
+  if (fadeTimer) clearInterval(fadeTimer);
+  fadeTimer = null;
+}
+
+/**
+ * Runs `then` once the record is genuinely making sound.
+ *
+ * A cued YouTube player needs a second or two to buffer after playVideo(), and
+ * moving the fader during that window fades the outgoing track down into
+ * silence — the mix becomes a gap. So: start both, wait for the incoming one,
+ * and only then touch the volume.
+ */
+function whenAudible(id: DeckId, then: () => void) {
+  const audible = () => {
+    const deck = useMixer.getState().decks[id];
+    return deck.playing && !deck.buffering;
+  };
+
+  if (audible()) {
+    then();
+    return;
+  }
+
+  let settled = false;
+  const settle = () => {
+    if (settled) return;
+    settled = true;
+    unsubscribe();
+    clearTimeout(timer);
+    abortPendingStart = null;
+    then();
+  };
+
+  const unsubscribe = useMixer.subscribe(() => {
+    if (audible()) settle();
+  });
+  // A stalled network must not leave the fader stuck forever.
+  const timer = setTimeout(settle, START_TIMEOUT_MS);
+
+  abortPendingStart = () => {
+    settled = true;
+    unsubscribe();
+    clearTimeout(timer);
+  };
+}
 
 /**
  * Animates the fader toward `to` over `seconds`. The position is interpolated
  * linearly and the equal-power curve is applied on top, which is how a
  * motorised hardware fader behaves.
+ *
+ * Both records play for the whole crossfade; the outgoing one is only parked
+ * once it is already silent.
  */
 export function startFade(to: DeckId, seconds = FADE_SECONDS) {
   const store = useMixer.getState();
@@ -150,35 +215,41 @@ export function startFade(to: DeckId, seconds = FADE_SECONDS) {
   const from = store.crossfader;
   const target = to === "A" ? 0 : 1;
 
-  cancelAnimationFrame(fadeFrame);
+  stopFadeTimer();
+  abortPendingStart?.();
+  abortPendingStart = null;
 
-  if (store.decks[to].track) play(to);
-
-  if (Math.abs(target - from) < 0.001) {
+  if (Math.abs(target - from) < 0.001 || !store.decks[to].track) {
     store.setFading(null);
     return;
   }
 
   store.setFading({ to });
-  const startedAt = performance.now();
 
-  const step = (now: number) => {
-    const progress = Math.min(1, (now - startedAt) / (duration * 1000));
-    useMixer.getState().setCrossfader(from + (target - from) * progress);
-    applyGains();
+  const animate = () => {
+    const startedAt = performance.now();
 
-    if (progress < 1) {
-      fadeFrame = requestAnimationFrame(step);
-      return;
-    }
-    finishFade(to);
+    stopFadeTimer();
+    fadeTimer = setInterval(() => {
+      const progress = Math.min(1, (performance.now() - startedAt) / (duration * 1000));
+      useMixer.getState().setCrossfader(from + (target - from) * progress);
+      applyGains();
+
+      if (progress >= 1) {
+        stopFadeTimer();
+        finishFade(to);
+      }
+    }, FADE_TICK_MS);
   };
 
-  fadeFrame = requestAnimationFrame(step);
+  play(to);
+  whenAudible(to, animate);
 }
 
 export function cancelFade() {
-  cancelAnimationFrame(fadeFrame);
+  stopFadeTimer();
+  abortPendingStart?.();
+  abortPendingStart = null;
   useMixer.getState().setFading(null);
 }
 
@@ -282,7 +353,9 @@ export function startEngine() {
     tickTimer = null;
     unsubscribe?.();
     unsubscribe = null;
-    cancelAnimationFrame(fadeFrame);
+    stopFadeTimer();
+    abortPendingStart?.();
+    abortPendingStart = null;
   };
 }
 
