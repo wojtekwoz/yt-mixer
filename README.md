@@ -57,17 +57,29 @@ Both players are created once at startup and never destroyed; tracks are swapped
 in with `loadVideoById`. That is what lets an unattended Auto mix start playback
 without tripping the browser's autoplay-gesture policy.
 
-## Session storage
+## Session storage — known broken in production
 
-Sessions live in memory in the Next.js server process
-(`lib/server/session-store.ts`), fanned out to browsers over SSE. That fits an
-ephemeral, single-host party and needs no database or credentials, but sessions
-do not survive a server restart and will not work across more than one server
-instance.
+Sessions live in memory in the server process (`lib/server/session-store.ts`),
+fanned out over SSE. That works perfectly with `pnpm dev`, where there is one
+process.
 
-To change that, reimplement that one module against Convex, Redis, or Postgres —
-`createSession`, `getSession`, `addRequest`, `setRequestStatus`, `setNowPlaying`,
-`subscribe`, `snapshot`. Nothing outside the file needs to change.
+**It does not work on Vercel.** Each serverless instance has its own memory, so
+a session created on one instance is invisible to every other one. Measured
+against the live deployment: after a burst of concurrent traffic, **40 out of 40
+reads of a freshly created session returned "not found"**, and now-playing was
+visible on 0 of 10 reads after a successful write. In practice the host opens a
+session, a friend opens the link, their request lands on a different instance,
+and the page reports that the party is over.
+
+The rest of the app is unaffected — records, fader, mix, queue and playback are
+entirely client-side and work fine in production.
+
+**The fix** is a shared datastore. `lib/server/session-store.ts` is the only file
+that needs to change; it exposes `createSession`, `getSession`, `addRequest`,
+`setRequestStatus`, `setNowPlaying`, `subscribe` and `snapshot`, and nothing
+outside it touches session state. Provision Redis (Upstash via the Vercel
+Marketplace has a free tier) and reimplement those seven functions against it,
+with `subscribe` polling or using Redis pub/sub.
 
 The host token is generated server-side and kept in the host's `localStorage`; it
 gates accepting requests and publishing now-playing. Nicknames are labels, not
